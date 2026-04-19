@@ -18,6 +18,7 @@ import com.bkash.rnd.pgwwebview.model.Checkout;
 import com.bkash.rnd.pgwwebview.model.PaymentRequest;
 import com.bkash.rnd.pgwwebview.utility.JavaScriptInterface;
 import com.google.gson.Gson;
+import android.annotation.SuppressLint;
 
 public class WebViewCheckoutActivity extends AppCompatActivity {
 
@@ -46,6 +47,7 @@ public class WebViewCheckoutActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         WebSettings webSettings = mWebView.getSettings();
+        @SuppressLint("SetJavaScriptEnabled")
         webSettings.setJavaScriptEnabled(true);
 
 
@@ -73,7 +75,11 @@ public class WebViewCheckoutActivity extends AppCompatActivity {
     private class CheckoutWebViewClient extends WebViewClient {
 
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-            handler.proceed();
+            // Security fix: reject invalid SSL certificates by default.
+            // handler.proceed() was removed to prevent accepting untrusted certificates.
+            // For development/testing with self-signed certs, consider using
+            // network_security_config.xml instead.
+            handler.cancel();
         }
 
         @Override
