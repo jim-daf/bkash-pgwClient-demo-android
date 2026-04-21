@@ -73,7 +73,11 @@ public class WebViewCheckoutActivity extends AppCompatActivity {
     private class CheckoutWebViewClient extends WebViewClient {
 
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-            handler.proceed();
+            // CWE-295: do NOT proceed on invalid certificates. This is a
+            // payment WebView; silently trusting any cert (or even
+            // prompting the user) lets a network attacker MITM the bKash
+            // checkout flow. Abort the request instead.
+            handler.cancel();
         }
 
         @Override
